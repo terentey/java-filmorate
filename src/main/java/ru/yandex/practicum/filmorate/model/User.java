@@ -12,13 +12,14 @@ import java.time.LocalDate;
 @Data
 public class User {
     Integer id;
+    String name;
     @NotNull
     @Email
     String email;
     @NotBlank
     @Login
     String login;
-    String name;
+    @NotNull
     @Past
     LocalDate birthday;
 }

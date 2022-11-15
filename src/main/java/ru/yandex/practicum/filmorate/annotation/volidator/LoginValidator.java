@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.annotation.Login;
 public class LoginValidator implements ConstraintValidator<Login, String> {
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        return !s.contains(" ");
+        if(s == null) return false;
+        else return !s.contains(" ");
     }
 }
