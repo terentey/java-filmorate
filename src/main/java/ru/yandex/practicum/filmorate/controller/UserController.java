@@ -14,13 +14,13 @@ import java.util.Map;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    Integer id = 0;
-    Map<Integer, User> users = new HashMap<>();
+    private Integer id = 0;
+    private Map<Integer, User> users = new HashMap<>();
 
     @PostMapping
     public User create(@RequestBody @Valid User user) {
         log.debug("Валидация пройдена.");
-        if(user.getName() == null) user.setName(user.getLogin());
+        checkName(user);
         id++;
         user.setId(id);
         users.put(id, user);
@@ -30,6 +30,7 @@ public class UserController {
     @PutMapping
     public User update(@RequestBody @Valid User user) {
         log.debug("Валидация пройдена.");
+        checkName(user);
         if(!users.containsKey(user.getId())) throw new IncorrectIdException();
         users.put(id, user);
         return user;
@@ -37,5 +38,10 @@ public class UserController {
     @GetMapping
     public Collection<User> find() {
         return users.values();
+    }
+
+    private void checkName(User user) {
+        String name = user.getName();
+        if(name == null || name.isBlank()) user.setName(user.getLogin());
     }
 }

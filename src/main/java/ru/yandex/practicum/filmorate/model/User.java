@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.*;
+
 import lombok.Data;
 import ru.yandex.practicum.filmorate.annotation.Login;
 
@@ -11,15 +9,15 @@ import java.time.LocalDate;
 
 @Data
 public class User {
-    Integer id;
-    String name;
+    private Integer id;
+    private String name;
     @NotNull
     @Email
-    String email;
+    private String email;
     @NotBlank
     @Login
-    String login;
+    private String login;
     @NotNull
-    @Past
-    LocalDate birthday;
+    @PastOrPresent
+    private LocalDate birthday;
 }
