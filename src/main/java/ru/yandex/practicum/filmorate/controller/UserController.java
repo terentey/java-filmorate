@@ -2,46 +2,64 @@ package ru.yandex.practicum.filmorate.controller;
 
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private Integer id = 0;
-    private Map<Integer, User> users = new HashMap<>();
+    private final UserService service;
+
+    @Autowired
+    public UserController(UserService service) {
+        this.service = service;
+    }
 
     @PostMapping
     public User create(@RequestBody @Valid User user) {
         log.debug("Валидация пройдена.");
-        checkName(user);
-        id++;
-        user.setId(id);
-        users.put(id, user);
-        return user;
+        return service.createUser(user);
     }
 
     @PutMapping
     public User update(@RequestBody @Valid User user) {
         log.debug("Валидация пройдена.");
-        checkName(user);
-        if(!users.containsKey(user.getId())) throw new IncorrectIdException();
-        users.put(id, user);
-        return user;
-    }
-    @GetMapping
-    public Collection<User> find() {
-        return users.values();
+        return service.updateUser(user);
     }
 
-    private void checkName(User user) {
-        String name = user.getName();
-        if(name == null || name.isBlank()) user.setName(user.getLogin());
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable int id, @PathVariable int friendId) {
+        service.addFriend(id, friendId);
+    }
+
+    @GetMapping
+    public Collection<User> find() {
+        return service.findAllUser();
+    }
+
+    @GetMapping("/{id}")
+    public User findById(@PathVariable int id) {
+        return service.findUserById(id);
+    }
+
+    @GetMapping("/{id}/friends")
+    public Collection<User> findFriends(@PathVariable int id) {
+        return service.findFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Collection<User> findCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+        return service.findCommonFriends(id, otherId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable int id, @PathVariable int friendId) {
+        service.deleteFriend(id, friendId);
     }
 }

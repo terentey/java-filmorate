@@ -6,6 +6,8 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.annotation.Login;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class User {
@@ -20,4 +22,5 @@ public class User {
     @NotNull
     @PastOrPresent
     private LocalDate birthday;
+    private Set<Integer> friends = new HashSet<>();
 }

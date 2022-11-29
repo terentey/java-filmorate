@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.util.ValidatorTest;
 
 import java.time.LocalDate;
 
-
+import static ru.yandex.practicum.filmorate.util.TestUser.setUpUser;
 
 public class UserTest {
     private final static String LOGIN = "dolore";
@@ -24,64 +24,55 @@ public class UserTest {
     @Test
     @DisplayName("Создание корректного юзера")
     public void createUser() {
-        setUpUser(LOGIN, NAME, EMAIL, BIRTHDAY);
+        setUpUser(user, LOGIN, NAME, EMAIL, BIRTHDAY);
         Assertions.assertTrue(ValidatorTest.getViolations(user).isEmpty());
     }
 
     @Test
     @DisplayName("Создание юзера с некорректным логином")
     public void createUserWithFailLogin() {
-        setUpUser("dol ore", NAME, EMAIL, BIRTHDAY);
+        setUpUser(user, "dol ore", NAME, EMAIL, BIRTHDAY);
         Assertions.assertFalse(ValidatorTest.getViolations(user).isEmpty());
     }
     @Test
     @DisplayName("Создание юзера с пустым логином")
     public void createUserWithEmptyLogin() {
-        setUpUser(null, NAME, EMAIL, BIRTHDAY);
+        setUpUser(user, null, NAME, EMAIL, BIRTHDAY);
         Assertions.assertFalse(ValidatorTest.getViolations(user).isEmpty());
     }
 
     @Test
     @DisplayName("Создание юзера с некорректной почтой")
     public void createUserWithFailEmail() {
-        setUpUser(LOGIN, NAME, "mail.ru", BIRTHDAY);
+        setUpUser(user, LOGIN, NAME, "mail.ru", BIRTHDAY);
         Assertions.assertFalse(ValidatorTest.getViolations(user).isEmpty());
     }
 
     @Test
     @DisplayName("Создание юзера с пустой почтой")
     public void createUserWithEmptyEmail() {
-        setUpUser(LOGIN, NAME, null, BIRTHDAY);
+        setUpUser(user, LOGIN, NAME, null, BIRTHDAY);
         Assertions.assertFalse(ValidatorTest.getViolations(user).isEmpty());
     }
 
     @Test
     @DisplayName("Создание юзера с некорректным ДР")
     public void createUserWithFailBirthday() {
-        setUpUser(LOGIN, NAME, EMAIL, LocalDate.of(2846,8,20));
+        setUpUser(user, LOGIN, NAME, EMAIL, LocalDate.of(2846,8,20));
         Assertions.assertFalse(ValidatorTest.getViolations(user).isEmpty());
     }
 
     @Test
     @DisplayName("Создание юзера с пустым ДР")
     public void createUserWithEmptyBirthday() {
-        setUpUser(LOGIN, NAME, EMAIL, null);
+        setUpUser(user, LOGIN, NAME, EMAIL, null);
         Assertions.assertFalse(ValidatorTest.getViolations(user).isEmpty());
     }
 
     @Test
     @DisplayName("Создание юзера с пустым именем")
     public void createUserWithEmptyName() {
-        setUpUser(LOGIN, null, EMAIL, BIRTHDAY);
+        setUpUser(user, LOGIN, null, EMAIL, BIRTHDAY);
         Assertions.assertTrue(ValidatorTest.getViolations(user).isEmpty());
     }
-
-    private void setUpUser(String login, String name, String email, LocalDate birthday) {
-        user.setLogin(login);
-        user.setName(name);
-        user.setEmail(email);
-        user.setBirthday(birthday);
-    }
-
-
 }
