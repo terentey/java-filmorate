@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -17,25 +18,27 @@ public class UserService {
         this.storage = storage;
     }
 
-    public User createUser(User user) {
+    public User create(User user) {
+        checkName(user);
         return storage.create(user);
     }
 
-    public User updateUser(User user) {
+    public User update(User user) {
+        checkName(user);
         return storage.update(user);
     }
 
-    public Collection<User> findAllUser() {
+    public Collection<User> findAll() {
         return storage.findAll();
     }
 
-    public User findUserById(int id) {
-        return storage.findById(id);
+    public User findById(int id) {
+        return storage.findById(id).orElseThrow(IncorrectIdException::new);
     }
 
     public void addFriend(int id, int friendId) {
-        User user = storage.findById(id);
-        storage.findById(friendId).getFriends().add(id);
+        User user = findById(id);
+        findById(friendId).getFriends().add(id);
         user.getFriends().add(friendId);
     }
 
@@ -49,6 +52,11 @@ public class UserService {
 
     public void deleteFriend(int id, int friendId) {
         storage.containsUser(friendId);
-        storage.findById(id).getFriends().remove(friendId);
+        findById(id).getFriends().remove(friendId);
+    }
+
+    private void checkName(User user) {
+        String name = user.getName();
+        if(name == null || name.isBlank()) user.setName(user.getLogin());
     }
 }

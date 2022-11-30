@@ -28,12 +28,12 @@ public class FilmServiceTest {
         film4 = newTestFilm(4);
         film5 = newTestFilm(5);
         film6 = newTestFilm(6);
-        service.createFilm(film1);
-        service.createFilm(film2);
-        service.createFilm(film3);
-        service.createFilm(film4);
-        service.createFilm(film5);
-        service.createFilm(film6);
+        service.create(film1);
+        service.create(film2);
+        service.create(film3);
+        service.create(film4);
+        service.create(film5);
+        service.create(film6);
     }
 
     @Test
@@ -41,11 +41,11 @@ public class FilmServiceTest {
     public void updateFilmTest() {
         int num = 7;
         Film newFilm = newTestFilm(num);
-        service.createFilm(newFilm);
+        service.create(newFilm);
         Film updateFilm = newTestFilm(8);
         updateFilm.setId(num);
-        service.updateFilm(updateFilm);
-        Assertions.assertEquals(service.findFilmById(num), updateFilm);
+        service.update(updateFilm);
+        Assertions.assertEquals(service.findById(num), updateFilm);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class FilmServiceTest {
         service.addLike(3,1);
         service.addLike(3,2);
 
-        Assertions.assertEquals(service.findFilmById(3).getLikes().size(), 2);
+        Assertions.assertEquals(service.findById(3).getLikes().size(), 2);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class FilmServiceTest {
     public void deleteLikeTest() {
         service.addLike(3,1);
         service.deleteLike(3,1);
-        Assertions.assertEquals(service.findFilmById(3).getLikes().size(), 0);
+        Assertions.assertEquals(service.findById(3).getLikes().size(), 0);
     }
 
     @Test
@@ -87,8 +87,7 @@ public class FilmServiceTest {
         service.addLike(6,3);
         service.addLike(6,4);
 
-        Assertions.assertEquals(service.findPopular(4), List.of(film4, film6, film5, film2));
-        Assertions.assertEquals(service.findPopular(null), List.of(film4, film6, film5, film2, film1, film3));
-        Assertions.assertEquals(service.findPopular(1), List.of(film4));
+        Assertions.assertEquals(service.findPopular("4"), List.of(film4, film6, film5, film2));
+        Assertions.assertEquals(service.findPopular("1"), List.of(film4));
     }
 }

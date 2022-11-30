@@ -5,6 +5,7 @@ import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
@@ -13,7 +14,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        checkName(user);
         id++;
         user.setId(id);
         users.put(id, user);
@@ -22,7 +22,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-        checkName(user);
         containsUser(user.getId());
         users.put(id, user);
         return user;
@@ -34,40 +33,34 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User findById(int id) {
-        containsUser(id);
-        return users.get(id);
+    public Optional<User> findById(int id) {
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
     public List<User> findFriends(int id) {
         containsUser(id);
-        List<User> friends = new ArrayList<>();
-        for (Integer friendId : users.get(id).getFriends()) {
-            friends.add(users.get(friendId));
-        }
-        return friends;
+        Set<Integer> friends = users.get(id).getFriends();
+        return users.values()
+                .stream()
+                .filter(u -> friends.contains(u.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<User> findCommonFriends(int id, int otherId) {
         containsUser(id);
         containsUser(otherId);
+        Set<Integer> friends = users.get(id).getFriends();
         Set<Integer> friendsOtherPerson = users.get(otherId).getFriends();
-        List<User> commonFriends = new ArrayList<>();
-        for(Integer friendId : users.get(id).getFriends()) {
-            if(friendsOtherPerson.contains(friendId)) commonFriends.add(users.get(friendId));
-        }
-        return commonFriends;
+        return users.values()
+                .stream()
+                .filter(u -> friends.contains(u.getId()) && friendsOtherPerson.contains(u.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override
     public void containsUser(int id) {
         if(!users.containsKey(id)) throw new IncorrectIdException();
-    }
-
-    private void checkName(User user) {
-        String name = user.getName();
-        if(name == null || name.isBlank()) user.setName(user.getLogin());
     }
 }

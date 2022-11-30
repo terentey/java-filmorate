@@ -10,5 +10,5 @@ public interface FilmStorage {
     Film update(Film film);
     Collection<Film> findAll();
     Film findById(int id);
-    List<Film> findPopular();
+    List<Film> findPopular(int count);
 }

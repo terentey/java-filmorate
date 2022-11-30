@@ -25,12 +25,12 @@ public class UserServiceTest {
         user4 = newTestUser(4);
         user5 = newTestUser(5);
         user6 = newTestUser(6);
-        service.createUser(user1);
-        service.createUser(user2);
-        service.createUser(user3);
-        service.createUser(user4);
-        service.createUser(user5);
-        service.createUser(user6);
+        service.create(user1);
+        service.create(user2);
+        service.create(user3);
+        service.create(user4);
+        service.create(user5);
+        service.create(user6);
     }
 
     @Test
@@ -38,11 +38,11 @@ public class UserServiceTest {
     public void updateUserTest() {
         int num = 7;
         User newUser = newTestUser(num);
-        service.createUser(newUser);
+        service.create(newUser);
         User updateUser = newTestUser(8);
         updateUser.setId(num);
-        service.updateUser(updateUser);
-        Assertions.assertEquals(updateUser, service.findUserById(num));
+        service.update(updateUser);
+        Assertions.assertEquals(updateUser, service.findById(num));
     }
 
     @Test

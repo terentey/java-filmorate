@@ -7,11 +7,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.Collection;
-import java.util.List;
 
 @Service
 public class FilmService {
-    private int DEFAULT_SIZE = 10;
     private final FilmStorage storage;
 
     @Autowired
@@ -19,37 +17,31 @@ public class FilmService {
         this.storage = storage;
     }
 
-    public Film createFilm(Film film) {
+    public Film create(Film film) {
         return storage.create(film);
     }
 
-    public Film updateFilm(Film film) {
+    public Film update(Film film) {
         return storage.update(film);
     }
 
-    public Collection<Film> findAllFilm() {
+    public Collection<Film> findAll() {
         return storage.findAll();
     }
 
-    public Film findFilmById(int id) {
+    public Film findById(int id) {
         return storage.findById(id);
     }
     public void addLike(int id, int userId) {
         storage.findById(id).getLikes().add(userId);
     }
 
-    public Collection<Film> findPopular(Integer count) {
-        List<Film> films = storage.findPopular();
-        if(count == null) {
-            if(films.size() > DEFAULT_SIZE) return films.subList(0, DEFAULT_SIZE);
-            else return films;
-        }
-        else if(films.size() > count) return films.subList(0, count);
-        else return films;
+    public Collection<Film> findPopular(String count) {
+        return storage.findPopular(Integer.parseInt(count));
     }
 
     public void deleteLike(int id, int userId) {
-        if(!findFilmById(id).getLikes().contains(userId)) throw new IncorrectIdException();
-        findFilmById(id).getLikes().remove(userId);
+        if(!findById(id).getLikes().contains(userId)) throw new IncorrectIdException();
+        findById(id).getLikes().remove(userId);
     }
 }

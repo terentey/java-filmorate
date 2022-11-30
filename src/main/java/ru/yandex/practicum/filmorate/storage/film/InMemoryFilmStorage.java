@@ -39,11 +39,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> findPopular() {
-        return films.values()
+    public List<Film> findPopular(int count) {
+        List<Film> populars = films.values()
                 .stream()
                 .sorted(Comparator.comparing((Film o) -> o.getLikes().size()).reversed())
                 .collect(Collectors.toList());
+        if(populars.size() > count) return populars.subList(0, count);
+        else return populars;
     }
 
     private void containsFilms(int id) {
