@@ -28,8 +28,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> findAll() {
-        return users.values();
+    public List<User> findAll() {
+        return List.copyOf(users.values());
     }
 
     @Override

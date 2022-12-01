@@ -87,7 +87,7 @@ public class FilmServiceTest {
         service.addLike(6,3);
         service.addLike(6,4);
 
-        Assertions.assertEquals(service.findPopular("4"), List.of(film4, film6, film5, film2));
-        Assertions.assertEquals(service.findPopular("1"), List.of(film4));
+        Assertions.assertEquals(service.findPopular(4), List.of(film4, film6, film5, film2));
+        Assertions.assertEquals(service.findPopular(1), List.of(film4));
     }
 }

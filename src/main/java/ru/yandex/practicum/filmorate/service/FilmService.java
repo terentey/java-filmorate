@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
-import java.util.Collection;
+import java.util.List;
 
 @Service
 public class FilmService {
@@ -25,7 +25,7 @@ public class FilmService {
         return storage.update(film);
     }
 
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         return storage.findAll();
     }
 
@@ -36,12 +36,13 @@ public class FilmService {
         storage.findById(id).getLikes().add(userId);
     }
 
-    public Collection<Film> findPopular(String count) {
-        return storage.findPopular(Integer.parseInt(count));
+    public List<Film> findPopular(Integer count) {
+        return storage.findPopular(count);
     }
 
     public void deleteLike(int id, int userId) {
-        if(!findById(id).getLikes().contains(userId)) throw new IncorrectIdException();
-        findById(id).getLikes().remove(userId);
+        Film film = findById(id);
+        if(!film.getLikes().contains(userId)) throw new IncorrectIdException();
+        film.getLikes().remove(userId);
     }
 }

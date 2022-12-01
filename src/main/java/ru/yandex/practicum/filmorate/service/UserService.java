@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -28,7 +27,7 @@ public class UserService {
         return storage.update(user);
     }
 
-    public Collection<User> findAll() {
+    public List<User> findAll() {
         return storage.findAll();
     }
 

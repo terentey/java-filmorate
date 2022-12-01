@@ -1,20 +1,17 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/films")
@@ -42,7 +39,7 @@ public class FilmController {
     }
 
     @GetMapping
-    public Collection<Film> find() {
+    public List<Film> find() {
         return service.findAll();
     }
 
@@ -52,17 +49,12 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> findPopular(@RequestParam(required = false, defaultValue = "10") @Positive String count) {
+    public List<Film> findPopular(@RequestParam(required = false, defaultValue = "10") @Positive Integer count) {
         return service.findPopular(count);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable int id, @PathVariable int userId) {
         service.deleteLike(id, userId);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<String> handleInvalidData(ConstraintViolationException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

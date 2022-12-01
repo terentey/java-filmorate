@@ -28,8 +28,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> findAll() {
-        return films.values();
+    public List<Film> findAll() {
+        return List.copyOf(films.values());
     }
 
     @Override
@@ -40,12 +40,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> findPopular(int count) {
-        List<Film> populars = films.values()
+        return films.values()
                 .stream()
                 .sorted(Comparator.comparing((Film o) -> o.getLikes().size()).reversed())
+                .limit(count)
                 .collect(Collectors.toList());
-        if(populars.size() > count) return populars.subList(0, count);
-        else return populars;
     }
 
     private void containsFilms(int id) {
