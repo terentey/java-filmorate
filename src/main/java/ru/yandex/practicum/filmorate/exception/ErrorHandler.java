@@ -21,25 +21,25 @@ public class ErrorHandler {
 
     @ExceptionHandler
     public ResponseEntity<Map<String,String>> handleIncorrectId(IncorrectIdException e) {
-        log.error("Неверный id");
+        log.error("Неверный id {}",e.getMessage());
         return getResponseEntity(NOT_FOUND);
     }
 
     @ExceptionHandler
     public ResponseEntity<Map<String,String>> handleArgumentNotValid(MethodArgumentNotValidException e) {
-        log.error("Невалидное значение, переданное в контролер");
+        log.error("Невалидное значение, переданное в контролер {}", e.getMessage());
         return getResponseEntity(BAD_REQUEST);
     }
 
     @ExceptionHandler
     public ResponseEntity<String> unhandledErrors(Throwable e) {
-        log.error("Необработанное исключение");
+        log.error("Необработанное исключение {} {}", e.getMessage(), e.getLocalizedMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handleInvalidData(ConstraintViolationException e) {
-        log.error("Невалидное значение");
+        log.error("Невалидное значение {}", e. getMessage());
         return new ResponseEntity<>(e.getMessage(), BAD_REQUEST);
     }
 
