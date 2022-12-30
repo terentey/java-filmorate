@@ -4,12 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.GenreAndMpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.util.TestFilm;
 
+import javax.sql.DataSource;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +20,7 @@ import java.util.Set;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FilmDbStorageTest {
+    private static JdbcTemplate jdbc = new JdbcTemplate(myDataSource());
     private final FilmDbStorage storage;
     private static Film film0;
     private static Film film1;
@@ -27,6 +31,26 @@ public class FilmDbStorageTest {
         film0 = TestFilm.newTestFilm(0);
         film1 = TestFilm.newTestFilm(1);
         film2 = TestFilm.newTestFilm(2);
+    }
+
+    @AfterAll
+    public static void restartDb() {
+        jdbc.update("DELETE FROM SCHEMA.GENRE_FILM; " +
+                "DELETE FROM SCHEMA.LIKES; " +
+                "DELETE FROM SCHEMA.USER_FRIEND; " +
+                "DELETE FROM SCHEMA.FILM; " +
+                "DELETE FROM SCHEMA.USERS; " +
+                "ALTER TABLE SCHEMA.FILM ALTER COLUMN ID RESTART; " +
+                "ALTER TABLE SCHEMA.USERS ALTER COLUMN ID RESTART;");
+    }
+
+    private static DataSource myDataSource() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("org.h2.Driver");
+        dataSource.setUrl("jdbc:h2:file:./db/filmorate");
+        dataSource.setUsername("sa");
+        dataSource.setPassword("password");
+        return dataSource;
     }
 
     @Order(1)
