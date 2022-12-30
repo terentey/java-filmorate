@@ -60,7 +60,21 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void containsUser(int id) {
+    public void addFriend(int id, int friendId) {
+        containsUser(id);
+        containsUser(friendId);
+        users.get(friendId).getFriends().add(id);
+        users.get(id).getFriends().add(friendId);
+    }
+
+    @Override
+    public void deleteFriend(int id, int friendId) {
+        containsUser(id);
+        containsUser(friendId);
+        users.get(id).getFriends().remove(friendId);
+    }
+
+    private void containsUser(int id) {
         if(!users.containsKey(id)) throw new IncorrectIdException();
     }
 }

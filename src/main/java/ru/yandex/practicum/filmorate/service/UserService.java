@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -13,7 +14,7 @@ public class UserService {
     private final UserStorage storage;
 
     @Autowired
-    public UserService(UserStorage storage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage storage) {
         this.storage = storage;
     }
 
@@ -36,9 +37,7 @@ public class UserService {
     }
 
     public void addFriend(int id, int friendId) {
-        User user = findById(id);
-        findById(friendId).getFriends().add(id);
-        user.getFriends().add(friendId);
+        storage.addFriend(id, friendId);
     }
 
     public List<User> findFriends(int id) {
@@ -50,8 +49,7 @@ public class UserService {
     }
 
     public void deleteFriend(int id, int friendId) {
-        storage.containsUser(friendId);
-        findById(id).getFriends().remove(friendId);
+        storage.deleteFriend(id, friendId);
     }
 
     private void checkName(User user) {

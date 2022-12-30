@@ -1,9 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.GenreAndMpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public class FilmService {
     private final FilmStorage storage;
 
     @Autowired
-    public FilmService(FilmStorage storage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage storage) {
         this.storage = storage;
     }
 
@@ -33,16 +34,22 @@ public class FilmService {
         return storage.findById(id);
     }
     public void addLike(int id, int userId) {
-        storage.findById(id).getLikes().add(userId);
+        storage.addLike(id, userId);
     }
 
     public List<Film> findPopular(Integer count) {
         return storage.findPopular(count);
     }
 
+    public List<GenreAndMpa> findAllGenreOrMpa(String genreOrMpa) {
+        return storage.findAllGenreOrMpa(genreOrMpa);
+    }
+
+    public GenreAndMpa findByIdGenreOrMpa(int id, String genreOrMpa) {
+        return storage.findByIdGenreOrMpa(id, genreOrMpa);
+    }
+
     public void deleteLike(int id, int userId) {
-        Film film = findById(id);
-        if(!film.getLikes().contains(userId)) throw new IncorrectIdException();
-        film.getLikes().remove(userId);
+        storage.deleteLike(id, userId);
     }
 }
