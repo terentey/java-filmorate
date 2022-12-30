@@ -1,3 +1,3 @@
 # java-filmorate
 Template repository for Filmorate project.
-![BD](https://sun9-3.userapi.com/impg/VwOm0RBhHqD2IWvyFjb_mDN7vz2TYRnItSNtHg/3Q-EcXuHZ5M.jpg?size=1293x555&quality=96&sign=e871d9fe8b8de2b7bcaacac014ff59d2&type=album)
+![BD](https://sun9-10.userapi.com/impg/oHfzUkunVsoWlnD2cFj0GH8KWvuAeetOfa8JMA/k90oNQYx3UM.jpg?size=771x558&quality=96&sign=7edfe5a532a60799b96ec06e14513046&type=album)
