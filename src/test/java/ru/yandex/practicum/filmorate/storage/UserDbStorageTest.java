@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.util.JdbcTest;
 import ru.yandex.practicum.filmorate.util.TestUser;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class UserDbStorageTest {
 
     @BeforeAll
     public static void setUp() {
+        JdbcTest.restartDb();
         user0 = TestUser.newTestUser(0);
         user1 = TestUser.newTestUser(1);
         user2 = TestUser.newTestUser(2);
