@@ -27,6 +27,7 @@ public class UserService {
 
     public User update(User user) {
         checkName(user);
+        storage.isExist(user.getId());
         return storage.update(user);
     }
 

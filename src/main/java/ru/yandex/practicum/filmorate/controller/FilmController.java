@@ -19,8 +19,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class FilmController {
-    private final static String GENRE = "genre";
-    private final static String MPA = "mpa";
     private final FilmService service;
 
     @PostMapping

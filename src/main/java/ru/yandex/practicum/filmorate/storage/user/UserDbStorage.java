@@ -15,7 +15,7 @@ import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
 
-import static ru.yandex.practicum.filmorate.util.Users.makeUser;
+import static ru.yandex.practicum.filmorate.util.UserMapper.makeUser;
 
 @Component("userDbStorage")
 @RequiredArgsConstructor
@@ -43,7 +43,7 @@ public class UserDbStorage implements UserStorage {
     public User update(User user) {
         String sql = "UPDATE schema.users SET name = ?, email = ?, login = ?, birthday = ? WHERE id = ?";
         jdbcTemplate.update(sql, user.getName(), user.getEmail(), user.getLogin(), user.getBirthday(), user.getId());
-        return findById(user.getId()).orElseThrow(IncorrectIdException::new);
+        return user;
     }
 
     @Override

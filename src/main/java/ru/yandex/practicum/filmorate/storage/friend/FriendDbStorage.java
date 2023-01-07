@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 
-import static ru.yandex.practicum.filmorate.util.Users.makeUser;
+import static ru.yandex.practicum.filmorate.util.UserMapper.makeUser;
 
 @Component
 @RequiredArgsConstructor

@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.util;
 
+import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Users {
+@UtilityClass
+public class UserMapper {
     public static User makeUser(ResultSet rs) throws SQLException {
         User user = new User();
         user.setId(rs.getInt("id"));

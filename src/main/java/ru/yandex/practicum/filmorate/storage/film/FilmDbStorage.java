@@ -16,6 +16,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component("filmDbStorage")
@@ -89,6 +90,15 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    @Override
+    public void isExist(int id) {
+        String sql = "SELECT EXISTS(SELECT * FROM schema.film WHERE id = ?)";
+        if(!jdbcTemplate.queryForObject(sql , ((rs, rowNum) -> rs.getBoolean(1)), id)) {
+            throw new IncorrectIdException();
+        }
+    }
+
+
     private Film makeFilm(ResultSet rs) throws SQLException {
         Film film = new Film();
         Integer id = rs.getInt("id");
@@ -107,61 +117,34 @@ public class FilmDbStorage implements FilmStorage {
         int id = film.getId();
         String sqlInsert = String.format("INSERT INTO schema.genre_film(genre_id, film_id) VALUES(?, %d)", id);
         jdbcTemplate.update("DELETE FROM schema.genre_film WHERE film_id = ?", id);
-        if(film.getGenres() != null) {
-            Set<Genre> genres = new LinkedHashSet<>(film.getGenres()
-                    .stream()
-                    .sorted(Comparator.comparing(Genre::getId))
-                    .collect(Collectors.toCollection(LinkedHashSet::new)));
-            List<Integer> ids = new ArrayList<>();
-            genres.forEach(g -> ids.add(g.getId()));
-            film.setGenres(genres);
+        if(!film.getGenres().isEmpty()) {
+            final List<Genre> genres = new ArrayList<>(film.getGenres());
             jdbcTemplate.batchUpdate(sqlInsert, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    ps.setInt(1, ids.get(i));
+                    ps.setInt(1, genres.get(i).getId());
                 }
 
                 @Override
                 public int getBatchSize() {
-                    return ids.size();
+                    return genres.size();
                 }
             });
         }
 
     }
 
-    @Override
-    public void isExist(int id) {
-        String sql = "SELECT EXISTS(SELECT * FROM schema.film WHERE id = ?)";
-        if(!jdbcTemplate.queryForObject(sql , ((rs, rowNum) -> rs.getBoolean(1)), id)) {
-            throw new IncorrectIdException();
-        }
-    }
-
     private void setGenres(List<Film> films) {
-        List<Integer> ids = new ArrayList<>();
-        Map<Integer, Set<Genre>> filmGenre;
-        films.forEach(o -> ids.add(o.getId()));
-        String inSql = String.join(",", Collections.nCopies(ids.size(), "?"));
-        String sql = String.format("SELECT * FROM schema.genre_film gf " +
+        String inSql = String.join(",", Collections.nCopies(films.size(), "?"));
+        final Map<Integer, Film> filmsById = films.stream().collect(Collectors.toMap(Film::getId, Function.identity()));
+        final String sqlQuery = String.format("SELECT * FROM schema.genre_film gf " +
                 "LEFT JOIN schema.genre g ON gf.genre_id = g.id WHERE film_id IN (%s)", inSql);
-        filmGenre = jdbcTemplate.query(sql, ids.toArray(), ((rs) -> {
-            Map<Integer, Set<Genre>> map = new HashMap<>();
-            while (rs.next()) {
-                int film_id = rs.getInt("film_id");
-                Genre genre = Genre.builder()
-                        .id(rs.getInt("genre_id")).name(rs.getString("name")).build();
-                if(map.containsKey(film_id)) {
-                    map.get(film_id).add(genre);
-                } else map.put(film_id, new HashSet<>(List.of(genre)));
-            }
-            return map;
-        }));
-        for(Film f : films) {
-            int film_id = f.getId();
-            if (filmGenre.containsKey(film_id)) {
-                f.setGenres(filmGenre.get(film_id));
-            } else f.setGenres(new HashSet<>());
-        }
+        jdbcTemplate.query(sqlQuery, (rs) -> {
+            final Film film = filmsById.get(rs.getInt("film_id"));
+            film.getGenres().add(Genre.builder()
+                    .id(rs.getInt("genre_id"))
+                    .name(rs.getString("name"))
+                    .build());
+        }, filmsById.keySet().toArray());
     }
 }

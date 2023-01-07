@@ -6,9 +6,7 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.annotation.ReleaseDate;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 @Data
 public class Film {
@@ -23,7 +21,7 @@ public class Film {
     @NotNull
     @Positive
     private Integer duration;
-    private Set<Genre> genres;
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
     @NotNull
     private Mpa mpa;
     private Integer rate;
