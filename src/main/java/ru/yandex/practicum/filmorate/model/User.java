@@ -22,5 +22,4 @@ public class User {
     @NotNull
     @PastOrPresent
     private LocalDate birthday;
-    private Set<Integer> friends = new HashSet<>();
 }

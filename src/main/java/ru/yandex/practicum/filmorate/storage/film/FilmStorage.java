@@ -10,4 +10,5 @@ public interface FilmStorage {
     List<Film> findAll();
     Film findById(int id);
     List<Film> findPopular(int count);
+    void isExist(int id);
 }

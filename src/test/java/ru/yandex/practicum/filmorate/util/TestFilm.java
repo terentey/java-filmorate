@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.util;
 
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
 
@@ -10,6 +11,8 @@ public class TestFilm {
         film.setDescription(description);
         film.setDuration(duration);
         film.setReleaseDate(releaseDate);
+        film.setRate(0);
+        film.setMpa(Mpa.builder().id(1).name("G").build());
     }
 
     public static Film newTestFilm(int num) {
