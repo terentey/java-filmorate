@@ -5,14 +5,15 @@ CREATE TABLE film(
     release_date DATE,
     duration INTEGER,
     mpa_id INTEGER REFERENCES mpa (id),
-    rate INTEGER,
+    rate INTEGER  DEFAULT 0,
     CONSTRAINT constr_date CHECK ( release_date >= '1895-12-28' ),
     CONSTRAINT constr_duration CHECK ( duration > 0 )
 );
 
 CREATE TABLE genre_film(
     film_id INTEGER REFERENCES film (id),
-    genre_id INTEGER REFERENCES genre (id)
+    genre_id INTEGER REFERENCES genre (id),
+    PRIMARY KEY (film_id, genre_id)
 );
 
 CREATE TABLE genre(
@@ -27,7 +28,8 @@ CREATE TABLE mpa(
 
 CREATE TABLE likes(
     film_id INTEGER REFERENCES film (id),
-    user_id INTEGER REFERENCES users (id)
+    user_id INTEGER REFERENCES users (id),
+    PRIMARY KEY (film_id, user_id)
 );
 
 CREATE TABLE users(
@@ -35,10 +37,13 @@ CREATE TABLE users(
     name VARCHAR NOT NULL ,
     email VARCHAR NOT NULL ,
     login VARCHAR NOT NULL ,
-    birthday DATE
+    birthday DATE,
+    CONSTRAINT user_email_uindex UNIQUE(email),
+    CONSTRAINT user_login_uindex UNIQUE(login)
 );
 
 CREATE TABLE user_friend(
-    user_1 INTEGER REFERENCES users (id),
-    user_2 INTEGER REFERENCES users (id)
+    user INTEGER REFERENCES users (id),
+    friend INTEGER REFERENCES users (id),
+    PRIMARY KEY (user, friend)
 );

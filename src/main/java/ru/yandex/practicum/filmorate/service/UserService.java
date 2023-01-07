@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
@@ -12,10 +12,12 @@ import java.util.List;
 @Service
 public class UserService {
     private final UserStorage storage;
+    private final FriendStorage friendStorage;
 
     @Autowired
-    public UserService(@Qualifier("userDbStorage") UserStorage storage) {
+    public UserService(UserStorage storage, FriendStorage friendStorage) {
         this.storage = storage;
+        this.friendStorage = friendStorage;
     }
 
     public User create(User user) {
@@ -37,19 +39,19 @@ public class UserService {
     }
 
     public void addFriend(int id, int friendId) {
-        storage.addFriend(id, friendId);
+        friendStorage.create(id, friendId);
     }
 
     public List<User> findFriends(int id) {
-        return storage.findFriends(id);
+        return friendStorage.findAll(id);
     }
 
     public List<User> findCommonFriends(int id, int otherId) {
-        return storage.findCommonFriends(id, otherId);
+        return friendStorage.findCommon(id, otherId);
     }
 
     public void deleteFriend(int id, int friendId) {
-        storage.deleteFriend(id, friendId);
+        friendStorage.delete(id, friendId);
     }
 
     private void checkName(User user) {

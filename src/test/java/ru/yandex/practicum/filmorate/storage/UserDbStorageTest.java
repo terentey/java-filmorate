@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.util.TestUser;
 
 import java.util.List;
@@ -15,7 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserDbStorageTest {
-    private final UserDbStorage storage;
+    private final UserStorage storage;
+    private final FriendStorage friendStorage;
     private static User user0;
     private static User user1;
     private static User user2;
@@ -77,16 +79,16 @@ public class UserDbStorageTest {
     @Test
     @DisplayName("Добавление друга с несуществующим id")
     public void addIncorrectFriend() {
-        Assertions.assertThrows(IncorrectIdException.class, () -> storage.addFriend(1, 99));
+        Assertions.assertThrows(IncorrectIdException.class, () -> friendStorage.create(1, 99));
     }
 
     @Order(7)
     @Test
     @DisplayName("Найти всех друзей юзера с id=1")
     public void findAllFriendsTest() {
-        storage.addFriend(1, 2);
-        storage.addFriend(1, 3);
-        List<User> ls = storage.findFriends(1);
+        friendStorage.create(1, 2);
+        friendStorage.create(1, 3);
+        List<User> ls = friendStorage.findAll(1);
         Assertions.assertTrue(ls.contains(user1));
         Assertions.assertTrue(ls.contains(user2));
         Assertions.assertEquals(2, ls.size());
@@ -96,16 +98,16 @@ public class UserDbStorageTest {
     @Test
     @DisplayName("Найти общих друзей юзеров с id=1 и id=3")
     public void findCommonFriendsTest() {
-        storage.addFriend(3,2);
-        Assertions.assertTrue(storage.findCommonFriends(1,3).contains(user1));
+        friendStorage.create(3,2);
+        Assertions.assertTrue(friendStorage.findCommon(1,3).contains(user1));
     }
 
     @Order(9)
     @Test
     @DisplayName("Удалить друга с id=1 у юзера с id=2")
     public void deleteFriendTest(){
-        storage.addFriend(2, 1);
-        storage.deleteFriend(2, 1);
-        Assertions.assertFalse(storage.findFriends(2).contains(user0));
+        friendStorage.create(2, 1);
+        friendStorage.delete(2, 1);
+        Assertions.assertFalse(friendStorage.findAll(2).contains(user0));
     }
 }

@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.annotation.ReleaseDate;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -22,8 +23,8 @@ public class Film {
     @NotNull
     @Positive
     private Integer duration;
-    private Set<GenreAndMpa> genres;
-    private GenreAndMpa mpa;
+    private Set<Genre> genres;
+    @NotNull
+    private Mpa mpa;
     private Integer rate;
-    private Set<Integer> likes = new HashSet<>();
 }

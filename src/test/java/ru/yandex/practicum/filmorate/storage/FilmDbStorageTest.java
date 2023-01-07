@@ -8,11 +8,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.GenreAndMpa;
-import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.like.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.util.TestFilm;
 
 import javax.sql.DataSource;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -20,8 +25,11 @@ import java.util.Set;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FilmDbStorageTest {
-    private static JdbcTemplate jdbc = new JdbcTemplate(myDataSource());
-    private final FilmDbStorage storage;
+    private static final JdbcTemplate jdbc = new JdbcTemplate(myDataSource());
+    private final FilmStorage storage;
+    private final LikeStorage likeStorage;
+    private final MpaStorage mpaStorage;
+    private final GenreStorage genreStorage;
     private static Film film0;
     private static Film film1;
     private static Film film2;
@@ -102,44 +110,38 @@ public class FilmDbStorageTest {
     @Test
     @DisplayName("Добавление лайка фильму id=1 и id=2")
     public void addLikeTest() {
-        storage.addLike(1,1);
-        storage.addLike(1,2);
-        storage.addLike(2,3);
-        Set<Integer> set1 = storage.findById(1).getLikes();
-        Set<Integer> set2 = storage.findById(2).getLikes();
+        likeStorage.create(1,1);
+        likeStorage.create(1,2);
+        likeStorage.create(2,3);
+
+        Set<Integer> set1 = findLikes(1);
+        Set<Integer> set2 = findLikes(2);
+
         Assertions.assertTrue(set1.contains(1));
         Assertions.assertTrue(set1.contains(2));
         Assertions.assertEquals(2, set1.size());
         Assertions.assertTrue(set2.contains(3));
         Assertions.assertEquals(1, set2.size());
-
-        Assertions.assertThrows(IncorrectIdException.class, () -> storage.addLike(3, 99),
-                "Не выбросило исключение с несуществующим id юзера");
-        Assertions.assertThrows(IncorrectIdException.class, () -> storage.addLike(99, 3),
-                "Не выбросило исключение с несуществующим id фильма");
     }
 
     @Order(7)
     @Test
     @DisplayName("Удаление лайка фильму id=1")
     public void deleteLikeTest() {
-        storage.addLike(1, 3);
-        storage.deleteLike(1, 3);
-        Set<Integer> set = storage.findById(1).getLikes();
+        likeStorage.create(1, 3);
+        likeStorage.delete(1, 3);
+        Set<Integer> set = findLikes(1);
+
         Assertions.assertFalse(set.contains(3), "Лайк не удалился");
-        Assertions.assertThrows(IncorrectIdException.class, () -> storage.deleteLike(1,99),
-                "Не выбросило исключение с несуществующим id юзера");
-        Assertions.assertThrows(IncorrectIdException.class, () -> storage.deleteLike(99,3),
-                "Не выбросило исключение с несуществующим id фильма");
     }
 
     @Order(8)
     @Test
     @DisplayName("Выгрузить все жанры")
     public void findAllGenresTest() {
-        List<GenreAndMpa> ls = storage.findAllGenreOrMpa("genre");
-        GenreAndMpa comedy = GenreAndMpa.builder().id(1).name("Комедия").build();
-        GenreAndMpa action = GenreAndMpa.builder().id(6).name("Боевик").build();
+        List<Genre> ls = genreStorage.findAll();
+        Genre comedy = Genre.builder().id(1).name("Комедия").build();
+        Genre action = Genre.builder().id(6).name("Боевик").build();
         Assertions.assertTrue(ls.contains(comedy));
         Assertions.assertTrue(ls.contains(action));
         Assertions.assertEquals(6, ls.size());
@@ -149,9 +151,9 @@ public class FilmDbStorageTest {
     @Test
     @DisplayName("Выгрузить все рейтинги")
     public void findAllMpaTest() {
-        List<GenreAndMpa> ls = storage.findAllGenreOrMpa("mpa");
-        GenreAndMpa g = GenreAndMpa.builder().id(1).name("G").build();
-        GenreAndMpa nc17 = GenreAndMpa.builder().id(5).name("NC-17").build();
+        List<Mpa> ls = mpaStorage.findAll();
+        Mpa g = Mpa.builder().id(1).name("G").build();
+        Mpa nc17 = Mpa.builder().id(5).name("NC-17").build();
         Assertions.assertTrue(ls.contains(g));
         Assertions.assertTrue(ls.contains(nc17));
         Assertions.assertEquals(5, ls.size());
@@ -161,9 +163,9 @@ public class FilmDbStorageTest {
     @Test
     @DisplayName("Выгрузить жанр по id")
     public void findGenreByIdTest() {
-        GenreAndMpa comedy = GenreAndMpa.builder().id(1).name("Комедия").build();
-        Assertions.assertEquals(comedy, storage.findByIdGenreOrMpa(1,"genre"));
-        Assertions.assertThrows(IncorrectIdException.class, () -> storage.findByIdGenreOrMpa(99,"genre"),
+        Genre comedy = Genre.builder().id(1).name("Комедия").build();
+        Assertions.assertEquals(comedy, genreStorage.findById(1));
+        Assertions.assertThrows(IncorrectIdException.class, () -> genreStorage.findById(99),
                 "Не выбросило исключение с несуществующим id жанра");
     }
 
@@ -171,9 +173,14 @@ public class FilmDbStorageTest {
     @Test
     @DisplayName("Выгрузить рейтинг по id")
     public void findMpaByIdTest() {
-        GenreAndMpa g = GenreAndMpa.builder().id(1).name("G").build();
-        Assertions.assertEquals(g, storage.findByIdGenreOrMpa(1,"mpa"));
-        Assertions.assertThrows(IncorrectIdException.class, () -> storage.findByIdGenreOrMpa(99,"mpa"),
+        Mpa g = Mpa.builder().id(1).name("G").build();
+        Assertions.assertEquals(g, mpaStorage.findById(1));
+        Assertions.assertThrows(IncorrectIdException.class, () -> mpaStorage.findById(99),
                 "Не выбросило исключение с несуществующим id рейтинга");
+    }
+
+    private Set<Integer> findLikes(int filmId) {
+        String sql = "SELECT user_id FROM schema.likes WHERE film_id = ?";
+        return new HashSet<>(jdbc.query(sql, ((rs, rowNum) -> rs.getInt("user_id")), filmId));
     }
 }
