@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.model;
 
 import javax.validation.constraints.*;
+
 import lombok.Data;
 import ru.yandex.practicum.filmorate.annotation.ReleaseDate;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 @Data
 public class Film {
@@ -21,5 +21,8 @@ public class Film {
     @NotNull
     @Positive
     private Integer duration;
-    private Set<Integer> likes = new HashSet<>();
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
+    @NotNull
+    private Mpa mpa;
+    private Integer rate;
 }
